@@ -26,20 +26,22 @@ g = tflearn.dropout(g,0.5)
 g = tflearn.lstm(g,512)
 g = tflearn.dropout(g,0.5)
 g = tflearn.fully_connected(g, len(char_idx), activation='softmax')
+g = tflearn.regression(g, optimizer='adam', loss='categorical_crossentropy',
+                       learning_rate=0.001)
 
 #generate cities
 m = tflearn.SequenceGenerator(g, dictionary=char_idx,
-                                seq_maxlen=maxlen,
-                                clip_gradients=5.0,
-                                checkpoint_path='model_us_cities')
+                              seq_maxlen=maxlen,
+                              clip_gradients=5.0,
+                              checkpoint_path='model_us_cities')
 
 #training
 for i in range(40):
     seed = random_sequence_from_textfile(path, maxlen)
-    m.fit(X, Y, validation_set = 0.1, batch_size=128,
-            n_epoch=1 ,run_id='us cities')
+    m.fit(X, Y, validation_set=0.1, batch_size=128,
+          n_epoch=1, run_id='us_cities')
     print("Testing")
-    print(m.generate(30,temperature=1.2,seq_seed=seed))
+    print(m.generate(30, temperature=1.2, seq_seed=seed))
     print("Testing")
     print(m.generate(30,temperature=1.0,seq_seed=seed))
     print("Testing")
